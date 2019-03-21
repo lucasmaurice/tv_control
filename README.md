@@ -14,11 +14,21 @@ This is a basic application for run a web api who can control a SHARP Tv control
 
 ## Usage
 
+### Run server
+
+``` Bash
+python3 main.py
+```
+
+### Command call
+
 Open the url related to the command you want to run.
 
-Will return the command execution status. (OK / ERR / TIMEOUT)
+Will return the command execution status. (OK / ERR / TIMEOUT / BAD REQUEST)
 
 ### Command list
+
+> Commands imported from [here](http://siica.sharpusa.com/portals/0/downloads/Manuals/mon_man_PNE471R.pdf).
 
 | Name      | URL     | Description               |
 |-----------|---------|---------------------------|
