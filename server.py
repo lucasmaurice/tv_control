@@ -17,9 +17,17 @@ class Server(BaseHTTPRequestHandler):
             print("Will Turn Off!")
             out = TvSerial.writeCommand("POWR0000")
             self.wfile.write(self.handle_http(200, "text/html", out))
+        elif self.path == "/mute":
+            print("Will Turn Off Audio!")
+            out = TvSerial.writeCommand("MUTE0001")
+            self.wfile.write(self.handle_http(200, "text/html", out))
+        elif self.path == "/unmute":
+            print("Will Turn On Audio!")
+            out = TvSerial.writeCommand("MUTE0000")
+            self.wfile.write(self.handle_http(200, "text/html", out))
         else:
             print(self.path)
-            self.wfile.write(self.handle_http(400, "text/html", "Bad request!"))
+            self.wfile.write(self.handle_http(400, "text/html", "BAD REQUEST!"))
     
     def handle_http(self, status, content_type, text):
         self.send_response(status)
