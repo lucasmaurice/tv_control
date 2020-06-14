@@ -11,19 +11,23 @@ class Server(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/on":
             print("Will Turn On!")
-            out = TvSerial.writeCommand("POWR0001")
+            out = TvSerial.writeCommandAsync("POWR0001")
             self.wfile.write(self.handle_http(200, "text/html", out))
         elif self.path == "/off":
             print("Will Turn Off!")
-            out = TvSerial.writeCommand("POWR0000")
+            out = TvSerial.writeCommandAsync("POWR0000")
             self.wfile.write(self.handle_http(200, "text/html", out))
         elif self.path == "/mute":
             print("Will Turn Off Audio!")
-            out = TvSerial.writeCommand("MUTE0001")
+            out = TvSerial.writeCommandAsync("MUTE0001")
             self.wfile.write(self.handle_http(200, "text/html", out))
         elif self.path == "/unmute":
             print("Will Turn On Audio!")
-            out = TvSerial.writeCommand("MUTE0000")
+            out = TvSerial.writeCommandAsync("MUTE0000")
+            self.wfile.write(self.handle_http(200, "text/html", out))
+        elif self.path == "/status":
+            print("Will get status!")
+            out = TvSerial.writeCommand("POWR   ?")
             self.wfile.write(self.handle_http(200, "text/html", out))
         else:
             print(self.path)
@@ -34,4 +38,3 @@ class Server(BaseHTTPRequestHandler):
         self.send_header('Content-type', content_type)
         self.end_headers()
         return bytes(text, "UTF-8")
-    

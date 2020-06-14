@@ -1,4 +1,4 @@
-import time, serial, signal
+import time, serial, threading
 
 class TvSerial:
     @staticmethod
@@ -6,11 +6,15 @@ class TvSerial:
         raise Exception("Serial connection timeout")
 
     @staticmethod
+    def writeCommandAsync(command):
+        thread = threading.Thread(target=TvSerial.writeCommand, args=(command,))
+        thread.daemon = True                            # Daemonize thread
+        thread.start()                                  # Start the execution
+        return "This is fine ¯\_(ツ)_/¯"
+
+    @staticmethod
     def writeCommand(command):
         print("Will execute: " + command)
-        
-        signal.signal(signal.SIGALRM, TvSerial.handler)
-        signal.alarm(10)
 
         try:
             # configure the serial connections (the parameters differs on the device you are connecting to)
@@ -26,7 +30,7 @@ class TvSerial:
             ser.write(serialcmd.encode())
 
             out = ''
-            while out != 'WAIT' and out != 'OK' and out != 'ERR':
+            while out != 'WAIT' and out != 'OK' and out != 'ERR' and out != "0" and out != "1":
 
                 # wait for answer
                 while ser.inWaiting() == 0:
@@ -41,8 +45,6 @@ class TvSerial:
                         out = ""
 
         except Exception:
-            return "TIMEOUT"
+            return "ERROR"
 
-        signal.alarm(0)
         return out
-
