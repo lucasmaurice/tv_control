@@ -1,34 +1,42 @@
 from http.server import BaseHTTPRequestHandler
-from tv_serial import TvSerial
 
 class Server(BaseHTTPRequestHandler):
+    power_status = None
+    mute_status = None
+    req_power_status = None
+    req_mute_status = None
+
     def do_HEAD(self):
         return
     
     def do_POST(self):
-        return
-    
+        content_len = int(self.headers.get('Content-Length'))
+        body = self.rfile.read(content_len)
+        print(body)
+        if body == b'1':
+            Server.req_power_status = True
+            self.wfile.write(self.handle_http(200, "text/html", "GG"))
+        elif body == b'0':
+            Server.req_power_status = False
+            self.wfile.write(self.handle_http(200, "text/html", "GG"))
+        else:
+            self.wfile.write(self.handle_http(400, "text/html", "BAD REQUEST!"))
+
     def do_GET(self):
         if self.path == "/on":
-            print("Will Turn On!")
-            out = TvSerial.writeCommandAsync("POWR0001")
-            self.wfile.write(self.handle_http(200, "text/html", out))
+            Server.req_power_status = True
+            self.wfile.write(self.handle_http(200, "text/html", "GG"))
         elif self.path == "/off":
-            print("Will Turn Off!")
-            out = TvSerial.writeCommandAsync("POWR0000")
-            self.wfile.write(self.handle_http(200, "text/html", out))
+            Server.req_power_status = False
+            self.wfile.write(self.handle_http(200, "text/html", "GG"))
         elif self.path == "/mute":
-            print("Will Turn Off Audio!")
-            out = TvSerial.writeCommandAsync("MUTE0001")
-            self.wfile.write(self.handle_http(200, "text/html", out))
+            Server.req_mute_status = True
+            self.wfile.write(self.handle_http(200, "text/html", "GG"))
         elif self.path == "/unmute":
-            print("Will Turn On Audio!")
-            out = TvSerial.writeCommandAsync("MUTE0000")
-            self.wfile.write(self.handle_http(200, "text/html", out))
-        elif self.path == "/status":
-            print("Will get status!")
-            out = TvSerial.writeCommand("POWR   ?")
-            self.wfile.write(self.handle_http(200, "text/html", out))
+            Server.req_mute_status = False
+            self.wfile.write(self.handle_http(200, "text/html", "GG"))
+        elif self.path == "/status" or self.path == "/api":
+            self.wfile.write(self.handle_http(200, "text/html", '1' if Server.power_status else '0'))
         else:
             print(self.path)
             self.wfile.write(self.handle_http(400, "text/html", "BAD REQUEST!"))
