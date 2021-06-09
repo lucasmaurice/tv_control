@@ -1,10 +1,19 @@
 from http.server import BaseHTTPRequestHandler
+from time import sleep
+from datetime import datetime
 
 class Server(BaseHTTPRequestHandler):
     power_status = None
     mute_status = None
     req_power_status = None
     req_mute_status = None
+    
+    def wait_power_status(self):
+        t = datetime.now()
+        while (datetime.now() - t).seconds < 5:
+            sleep(0.1)
+            if Server.req_power_status == None:
+                return
 
     def do_HEAD(self):
         return
@@ -36,6 +45,7 @@ class Server(BaseHTTPRequestHandler):
             Server.req_mute_status = False
             self.wfile.write(self.handle_http(200, "text/html", "GG"))
         elif self.path == "/status" or self.path == "/api":
+            self.wait_power_status()
             self.wfile.write(self.handle_http(200, "text/html", '1' if Server.power_status else '0'))
         else:
             print(self.path)
